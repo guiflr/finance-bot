@@ -7,6 +7,8 @@ const evaluateAnswer = async (text: string, data?: any) => {
   let feedbackPrompt = `Gere uma mensagem personalizada de resposta ao usuário com base nesta ação: ${JSON.stringify(text)}.
 
    ${data ? `E aqui está o resultado que a ação da query retornou: ${data}` : ''} 
+
+   Não precisa retornar um texto enorme, quando houver uma inserção por exemplo, coloque um texto simples de que o evento foi registrado na base de dados.
   `;
   const feedbackModel = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!).getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
   const feedbackResult = await feedbackModel.generateContent(feedbackPrompt);
@@ -26,11 +28,14 @@ export const processIncomingMessage = async (message: string, phoneNumber: strin
       let transactions;
       if (aiResponse.sql) {
         const sql = aiResponse.sql.toLowerCase();
-        if (!sql.startsWith('select') || !sql.includes('transaction')) {
+        if (!sql.startsWith('select') || !sql.includes('movements')) {
           throw new Error('Query não autorizada');
         }
         transactions = await rawQuery(aiResponse.sql)
-        return evaluateAnswer(JSON.stringify(aiResponse), transactions);
+        const json = JSON.stringify(transactions, (_, value) =>
+  typeof value === 'bigint' ? value.toString() : value
+);
+        return evaluateAnswer(JSON.stringify(aiResponse), json);
       }
       return  evaluateAnswer(JSON.stringify(aiResponse));
 

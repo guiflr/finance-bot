@@ -10,10 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Transaction {
+model movements {
   id          Int      @id @default(autoincrement())
   description String
   category    String
+  category_slug String
   amount      Float
   type        String
   date        DateTime
