@@ -7,6 +7,7 @@ import {
 } from "@google/genai";
 import {  controlLightDeclaration } from "../ai/google.js";
 import { categories } from "../utils/categories.js";
+import { incomingCategories } from "../utils/incoming-categories.js";
 
 async function main() {
   try {
@@ -27,13 +28,14 @@ async function main() {
     console.log('[TOOLS]: ', tools)
     console.log('[mcpClient - CONNECTED]')
     
-      const question = "gastos da semana";
+      const question = "ganhos de hoje";
       if (question.toLowerCase() === "exit") {
         throw new Error('EXIT COMMAND')
       }
 
       try {
-        const system = `se inspire nestas categorias de produtos para criar ou buscar categorias: ${categories}. Você é um agente financeiro, de acordo com este texto de um usuário: ${question} 
+        const system = `se inspire nestas categorias de produtos para criar ou buscar categorias de gastos: ${categories} e categorias de entradas: ${incomingCategories}. 
+        Você é um agente financeiro, de acordo com este texto de um usuário: ${question}         
         defina se isso tem a ver com uma solicitação de consulta apenas ou um dado que ele esta querendo inserir nos seus gastos ou como um ganho(entrada)`
         console.log('INIT')
         console.log('questionquestion ', question)
@@ -45,7 +47,8 @@ async function main() {
               functionCallingConfig: {
                 // Force it to call any function
                 mode: FunctionCallingConfigMode.ANY,
-                allowedFunctionNames: ["createMovementAtDatabase", 'getMovementsByCategorySlug', 'getMovementsBetweenDates', 'getMovementsByDescription'],
+                allowedFunctionNames: ["createMovementAtDatabase", 'getMovementsByCategorySlug', 
+                  'getMovementsBetweenDates', 'getMovementsByDescription', 'getEntryMovementsByBetweenDates'],
               },
             },
             tools: [{ functionDeclarations: controlLightDeclaration }],

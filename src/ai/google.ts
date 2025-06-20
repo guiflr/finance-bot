@@ -88,6 +88,23 @@ export const controlLightDeclaration: FunctionDeclaration[] = [
       required: ["startDate", "endDate"],
     },
   },
+  {
+    name: "getEntryMovementsByBetweenDates",
+    description: `Ferramenta para buscar os ganhos de um usuário, apenas passe as datas e a ferramenta erá buscar apenas movimentações de ganhos(entry),
+    entradas, lucros do usuário, utilize esta data como referência, ela é a DATA DE AGORA: ${new Date().toISOString()}  
+    para criar novas datas ou formatar alguma data para passar como parâmetro, troque o dias, mês ou horário de startDate e endDate para buscar dados passados, 
+    por exemplo se o usuário pede os dados do dia de hoje, você deverá alterar o horario da data buscando da meia noite de hoje até as 23:59 de hoje para encontrar todos os dados de hoje, e assim por diante, faça isso sempre que precisar buscar dados por data, 
+    seja de hoje, ontem ou qualquer outro dia, sempre faça essa formatação para que busque os dados dos dias e horários corretos`,
+    parameters: {
+      type: Type.OBJECT,
+      description: "Busca movimentações de entradas ou gastos(entry) entre duas datas",
+      properties: {
+          startDate: { type: Type.STRING },
+          endDate: { type: Type.STRING },
+        },
+      required: ["startDate", "endDate"],
+    },
+  },
 ];
 
 export const aiGemini = new GoogleGenAI({

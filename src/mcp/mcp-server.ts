@@ -27,6 +27,25 @@ async function getMovementsByDescription({ description }: { description: string 
   return { content: formattedMovements };
 }
 
+async function getEntryMovementsByBetweenDates({ endDate, startDate }: { startDate: string; endDate: string }) {
+  const movements = await prisma.movements.findMany({
+    where: {
+      date: {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      },
+      AND: {
+        type: 'entry'
+      }
+    },
+  });
+  const formattedMovements = movements.map((movement) => ({
+    type: "text" as const,
+    text: JSON.stringify(movement),
+  }));
+  return { content: formattedMovements };
+}
+
 const server = new McpServer({
   name: "Movements MCP Server",
   version: "1.0.0",
@@ -51,6 +70,18 @@ server.tool(
   },
   getMovementsByDescription
 );
+
+// Ferramenta: Consulta ganhos por data
+server.tool(
+  "getEntryMovementsByBetweenDates",
+  "busca uma movimentação de ganho(entry) por data",
+  {
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
+  },
+  getEntryMovementsByBetweenDates
+);
+
 
 // Ferramenta: Consulta por últimos X dias
 server.tool(
