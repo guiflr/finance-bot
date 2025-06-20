@@ -5,13 +5,24 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { prisma } from "../prisma/client";
 
-async function getMovementsByCategory({ category }: { category: string }) {
+async function getMovementsByCategorySlug({ category_slug }: { category_slug: string }) {
   const movements = await prisma.movements.findMany({
-    where: { category: { equals: category } },
+    where: { category_slug: { equals: category_slug } },
   });
   const formattedMovements = movements.map((movement) => ({
     type: "text" as const,
-    text: JSON.stringify(movement.description),
+    text: JSON.stringify(movement),
+  }));
+  return { content: formattedMovements };
+}
+
+async function getMovementsByDescription({ description }: { description: string }) {
+  const movements = await prisma.movements.findMany({
+    where: { description: { contains: description } },
+  });
+  const formattedMovements = movements.map((movement) => ({
+    type: "text" as const,
+    text: JSON.stringify(movement),
   }));
   return { content: formattedMovements };
 }
@@ -23,12 +34,22 @@ const server = new McpServer({
 
 // Ferramenta: Consulta por categoria
 server.tool(
-  "getMovementsByCategory",
+  "getMovementsByCategorySlug",
   "busca uma movimentação por categoria",
   {
-    category: z.string(),
+    category_slug: z.string(),
   },
-  getMovementsByCategory
+  getMovementsByCategorySlug
+);
+
+// Ferramenta: Consulta por descrição
+server.tool(
+  "getMovementsByDescription",
+  "busca uma movimentação por pela descrição",
+  {
+    description: z.string(),
+  },
+  getMovementsByDescription
 );
 
 // Ferramenta: Consulta por últimos X dias
@@ -59,7 +80,7 @@ server.tool(
 // Ferramenta: Consulta entre duas datas
 server.tool(
   "getMovementsBetweenDates",
-  "Busca movimentos entre duas datas",
+  "Busca movimentações de sáidas(expense) entre duas datas",
   {
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
@@ -75,7 +96,7 @@ server.tool(
     });
     const formattedMovements = movements.map((movement) => ({
       type: "text" as const,
-      text: JSON.stringify(movement.description),
+      text: JSON.stringify(movement),
     }));
     return { content: formattedMovements };
   }
@@ -107,6 +128,19 @@ server.tool(
       type: "text" as const,
       text: JSON.stringify(created),
     };
+    return { content: [formattedMovements] };
+  }
+);
+
+server.tool(
+  "defaultMessageWhenNotCanDefineMessage",
+  "Mensagem de erro padrão quando não consegue definir se uma mensagem do usuário é uma consulta ou um comando na base dados.",
+  {},
+  async () => {   
+    const formattedMovements = {
+      type: "text" as const,
+      text: 'Não consegui definir se você está querendo fazer uma consulta ou inserir um gasto ou um ganho',
+    }
     return { content: [formattedMovements] };
   }
 );
