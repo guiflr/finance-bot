@@ -9,7 +9,7 @@ import {  controlLightDeclaration } from "../ai/google.js";
 import { categories } from "../utils/categories.js";
 import { incomingCategories } from "../utils/incoming-categories.js";
 
-async function main() {
+export async function main(message: string, phoneNumber: string) {
   try {
     const aiGemini = new GoogleGenAI({ apiKey: "",  });
       console.log('[mcpClient - INIT]')
@@ -28,7 +28,7 @@ async function main() {
     console.log('[TOOLS]: ', tools)
     console.log('[mcpClient - CONNECTED]')
     
-      const question = "ganhos de hoje";
+      const question = message
       if (question.toLowerCase() === "exit") {
         throw new Error('EXIT COMMAND')
       }
@@ -98,21 +98,17 @@ async function main() {
               console.log('followUpResponse.text: ', followUpResponse.text)
             }
           } catch (error: any) {
-            console.log("error ", error);
+            return error
           }
         }
       } catch (error: any) {
-        console.log("while error ", error);
+        return error
       }
     
 
     process.exit(0);
   } catch (error: any) {
     console.log("general error ", error);
-    process.exit(1);
+    return error
   }
 }
-
-main().catch((error) => {
-  process.exit(1);
-});
