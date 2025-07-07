@@ -48,7 +48,7 @@ async function main() {
                 // Force it to call any function
                 mode: FunctionCallingConfigMode.ANY,
                 allowedFunctionNames: ["createMovementAtDatabase", 'getMovementsByCategorySlug', 
-                  'getMovementsBetweenDates', 'getMovementsByDescription', 'getEntryMovementsByBetweenDates'],
+                  'getMovementsBetweenDates', 'getMovementsByDescription', 'getEntryMovementsByBetweenDates', 'getExpenseMovementsByBetweenDates'],
               },
             },
             tools: [{ functionDeclarations: controlLightDeclaration }],

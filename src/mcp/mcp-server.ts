@@ -46,6 +46,25 @@ async function getEntryMovementsByBetweenDates({ endDate, startDate }: { startDa
   return { content: formattedMovements };
 }
 
+async function getExpenseMovementsByBetweenDates({ endDate, startDate }: { startDate: string; endDate: string }) {
+  const movements = await prisma.movements.findMany({
+    where: {
+      date: {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      },
+      AND: {
+        type: 'expense'
+      }
+    },
+  });
+  const formattedMovements = movements.map((movement) => ({
+    type: "text" as const,
+    text: JSON.stringify(movement),
+  }));
+  return { content: formattedMovements };
+}
+
 const server = new McpServer({
   name: "Movements MCP Server",
   version: "1.0.0",
@@ -80,6 +99,17 @@ server.tool(
     endDate: z.string().datetime(),
   },
   getEntryMovementsByBetweenDates
+);
+
+// Ferramenta: Consulta gastos por data
+server.tool(
+  "getExpenseMovementsByBetweenDates",
+  "Busca movimentações de gastos(entry) entre duas datas",
+  {
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
+  },
+  getExpenseMovementsByBetweenDates
 );
 
 

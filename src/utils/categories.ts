@@ -74,5 +74,4 @@ Alimentação,Carnes,alimentacao
 Alimentação,Frutas,alimentacao
 Alimentação,Verduras,alimentacao
 Alimentação,Legumes,alimentacao
-
 `
